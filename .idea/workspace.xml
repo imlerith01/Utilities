@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="feeec120-69bc-4f5e-bf3c-77a8fc4a6773" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ifc reader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,14 +34,20 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Python.Unlock pdf.executor": "Run",
+    "Python.ifc reader.executor": "Run",
     "Python.tkinter_test.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/OneDrive/OneDrive - PFM-Group a.s/Environment",
+    "last_opened_file_path": "C:/OneDrive/OneDrive - PFM-Group a.s/Automation/Utilities",
     "settings.editor.selected.configurable": "preferences.pluginManager"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\OneDrive\OneDrive - PFM-Group a.s\Automation\Utilities" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
