@@ -1,8 +1,9 @@
 import json
+import os
 
 # Define the data to be added
 extension_data = {
-    "builtin": "False",
+    "builtin": "True",
     "default_enabled": "True",
     "type": "extension",
     "rocket_mode_compatible": "False",
@@ -16,8 +17,11 @@ extension_data = {
     "dependencies": []
 }
 
+# Get the path to the user's home directory
+home_dir = os.path.expanduser("~")
+
 # Path to the JSON file
-json_file_path = r"C:\Users\dvoracek\AppData\Roaming\pyRevit-Master\extensions\extensions.json"
+json_file_path = os.path.join(home_dir, "AppData", "Roaming", "pyRevit-Master", "extensions", "extensions.json")
 
 # Read the existing JSON data
 with open(json_file_path, 'r') as file:
