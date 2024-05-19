@@ -49,7 +49,7 @@ def convert_length(value, from_unit, to_unit):
 def convert_weight(value, from_unit, to_unit):
     conversion_factors = {
         'kilograms': 1,
-        'grams': 1000,
+        'grams': 0.001, # 1 gram = 0.001 kilograms
         'pounds': 0.453592, # 1 pound = 0.453592 kilograms
         'ounces': 0.0283495 # 1 ounce = 0.0283495 kilograms
     }
