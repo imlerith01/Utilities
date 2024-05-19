@@ -1,62 +1,77 @@
-import os
-import pandas as pd
 import ifcopenshell
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
+model = ifcopenshell.open(r"C:\Users\dvjak\Documents\GitHub\Utilities\AC20-FZK-Haus.ifc")
+
+# print(model.schema) # May return IFC2X3, IFC4, or IFC4X3
+
+# print(model.by_id(1)) # Get data by GlobalId
+
+# print(model.by_guid("0EI0MSHbX9gg8Fxwar7lL8"))
+walls = model.by_type('IfcWall')
+# print(len(walls)) #Get number of IfcWall elemetns
 
 
-def extract_ifc_data(ifc_file_path):
-    # Load the IFC file
-    ifc_file = ifcopenshell.open(ifc_file_path)
+wall = model.by_type('IfcWall')[0] # Get the first item in IfcWall list
+# print(wall.is_a()) # Returns class of provided element
 
-    # Dictionary to hold all entities and their attributes
-    data = {
-        'id': [],
-        'type': [],
-        'attributes': []
-    }
+# print(wall.is_a('IfcWall')) # Returns True
+# print(wall.is_a('IfcElement')) # Returns True
+# print(wall.is_a('IfcWindow')) # Returns False
 
-    # Iterate through all entities in the IFC file
-    for entity in ifc_file.by_type('IfcRoot'):  # This gets all entities; adjust the type as needed
-        data['id'].append(entity.id())
-        data['type'].append(entity.is_a())
-        attrs = []
-        for attr in entity.get_info().values():
-            # Compile attributes into a single string for simplicity; customize as needed
-            attrs.append(str(attr))
-        data['attributes'].append('; '.join(attrs))
+# print(wall.id())
 
-    # Convert dictionary to pandas DataFrame
-    df = pd.DataFrame(data)
-    return df
+# Access parameters by atribute
+# print(wall[0]) # The first attribute is the GlobalId
+# print(wall[2]) # The third attribute is the Name
+
+# Access parameters by name
+# print(wall.GlobalId)
+# print(wall.Name)
+
+# Gives us a dictionary of attributes, such as:
+# {'id': 8, 'type': 'IfcWall', 'GlobalId': '2_qMTAIHrEYu0vYcqK8cBX', ... }
 
 
-def select_ifc_file():
-    # Hide the root window
-    Tk().withdraw()
-    # Show an "Open" dialog box and return the path to the selected file
-    filename = askopenfilename(filetypes=[("IFC files", "*.ifc")])
-    return filename
+# Get all parameters
+# print(wall.get_info())
+
+# Get element psets and parameters
+# import ifcopenshell.util
+# import ifcopenshell.util.element
+# print(ifcopenshell.util.element.get_psets(wall))
 
 
-def main():
-    # Let user select an IFC file
-    ifc_file_path = select_ifc_file()
+# print(wall.IsDefinedBy)
 
-    if ifc_file_path:
-        print(f"Selected file: {ifc_file_path}")
-        # Extract data from the selected IFC file
-        df = extract_ifc_data(ifc_file_path)
+# Get related elements
+# print(model.get_inverse(wall))
 
-        # Define the Excel file path
-        excel_file_path = os.path.splitext(ifc_file_path)[0] + '.xlsx'
+# print(model.traverse(wall))
+# # Or, let's just go down one level deep
+# print(model.traverse(wall, max_levels=1))
 
-        # Write DataFrame to an Excel file in the same directory as the IFC file
-        df.to_excel(excel_file_path, index=False)
-        print(f"Data exported to Excel file: {excel_file_path}")
-    else:
-        print("No file selected. Exiting...")
-
-
-if __name__ == "__main__":
-    main()
+# Function to change the PSet name for a specific IfcWall
+# def change_pset_name(old_pset_name, new_pset_name):
+#     # Find the specific IfcWall
+#     wall = model.by_type('IfcWall')[0]
+#     if not wall:
+#         print("Wall not found!")
+#         return
+#
+#     # Iterate through property sets of the wall
+#     for definition in wall.IsDefinedBy:
+#         if definition.is_a('IfcRelDefinesByProperties'):
+#             property_set = definition.RelatingPropertyDefinition
+#             if property_set.is_a('IfcPropertySet') and property_set.Name == old_pset_name:
+#                 # Change the PSet name
+#                 property_set.Name = new_pset_name
+#                 print(f"Property Set name changed to {new_pset_name}")
+#                 return
+#
+#     print("Property Set not found!")
+#
+#
+# # Call the function with specific parameters
+# change_pset_name(  'Pset_WallCommon', 'Testing')
+#
+# # Write the changes to a new IFC file
+# model.write(r"C:\Users\dvjak\Documents\GitHub\Utilities\AC20-FZK-Haus.ifc")
