@@ -29,6 +29,6 @@ st.subheader('My sub')
 st.code('for i in range(8): foo()')
 
 # Insert containers separated into tabs:
->>> tab1, tab2 = st.tabs(["Tab 1", "Tab2"])
->>> tab1.write("this is tab 1")
->>> tab2.write("this is tab 2")
+tab1, tab2 = st.tabs(["Tab 1", "Tab2"])
+tab1.write("this is tab 1")
+tab2.write("this is tab 2")
