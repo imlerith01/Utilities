@@ -50,10 +50,11 @@ def convert_weight(value, from_unit, to_unit):
     conversion_factors = {
         'kilograms': 1,
         'grams': 1000,
-        'pounds': 2.20462,
-        'ounces': 35.274
+        'pounds': 0.453592, # 1 pound = 0.453592 kilograms
+        'ounces': 0.0283495 # 1 ounce = 0.0283495 kilograms
     }
-    return value * conversion_factors[from_unit] / conversion_factors[to_unit]
+    value_in_kg = value * conversion_factors[from_unit]
+    return value_in_kg / conversion_factors[to_unit]
 
 def convert_temperature(value, from_unit, to_unit):
     if from_unit == 'Celsius' and to_unit == 'Fahrenheit':
