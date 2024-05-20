@@ -1,6 +1,11 @@
 import streamlit as st
 
 st.write("Hello world")
+st.write("Hello world")
+st.write("Hello world")
+st.write("Hello world")
+st.write("Hello world")
+st.write("Hello world")
 st.button('Hit me')
 st.checkbox('Check me out')
 st.radio('Pick one:', ['nose','ear'])
