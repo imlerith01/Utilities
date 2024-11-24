@@ -5,10 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="feeec120-69bc-4f5e-bf3c-77a8fc4a6773" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Utilities.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Utilities.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/random panels/script.py" beforeDir="false" afterPath="$PROJECT_DIR$/random panels/script.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/random panels/logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/random_panels/logo.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/random panels/script.py" beforeDir="false" afterPath="$PROJECT_DIR$/random_panels/script.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,6 +53,7 @@
       <recent name="C:\OneDrive\OneDrive - PFM-Group a.s\Automation\Utilities" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Git\Utilities\random panels" />
       <recent name="C:\OneDrive\OneDrive - PFM-Group a.s\Automation\Utilities" />
       <recent name="C:\Users\dvjak\Documents\GitHub\Utilities" />
     </key>
