@@ -45,7 +45,7 @@ def generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circ
 # Streamlit App
 def main():
     # Display the logo at the top of the app
-    st.image("logo.jpg", width=150)  # Adjust the file path and size as needed
+
 
     st.title("Generátor kruhů")
 
