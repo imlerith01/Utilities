@@ -92,8 +92,8 @@ def main():
             + num_blue_circles * math.pi * (blue_circle_radius ** 2)
             + num_green_circles * math.pi * (green_circle_radius ** 2)
         )
-        ratio = total_circle_surface / canvas_surface
-        st.write(f"### Poměr plochy kruhů k ploše plátna: {ratio:.2f}")
+        ratio_percentage = (total_circle_surface / canvas_surface) * 100
+        st.write(f"### Poměr plochy kruhů k ploše plátna: {ratio_percentage:.2f}%")
 
         # Create PNG and CSV data
         buffer = BytesIO()
