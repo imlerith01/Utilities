@@ -44,7 +44,10 @@ def generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circ
 
 # Streamlit App
 def main():
-    st.title("Generátor kruhů bez překrývání")
+    # Display the logo at the top of the app
+
+
+    st.title("Generátor kruhů")
 
     # Sidebar for inputs
     st.sidebar.header("Nastavení plátna")
@@ -66,35 +69,44 @@ def main():
     num_green_circles = st.sidebar.slider("Počet zelených kruhů", 1, 100, 10)
     green_circle_radius = st.sidebar.slider("Poloměr zelených kruhů", 1, 100, 5)
 
-    # Generate circles
-    circle_specs = [
-        ("red", red_circle_radius, num_red_circles, "red"),
-        ("blue", blue_circle_radius, num_blue_circles, "blue"),
-        ("green", green_circle_radius, num_green_circles, "green"),
-    ]
+    # Initialize session state
+    if "generated_fig" not in st.session_state:
+        st.session_state["generated_fig"] = None
+    if "circle_data" not in st.session_state:
+        st.session_state["circle_data"] = None
 
     if st.sidebar.button("Generovat"):
-        st.write("### Vygenerované plátno")
+        # Generate circles and store in session state
+        circle_specs = [
+            ("red", red_circle_radius, num_red_circles, "red"),
+            ("blue", blue_circle_radius, num_blue_circles, "blue"),
+            ("green", green_circle_radius, num_green_circles, "green"),
+        ]
         fig, circle_data = generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circles)
-        st.pyplot(fig)
+        st.session_state["generated_fig"] = fig
+        st.session_state["circle_data"] = circle_data
 
-        # Save the figure to a BytesIO buffer
+    # Check if a figure is stored in session state
+    if st.session_state["generated_fig"] is not None:
+        st.write("### Vygenerované plátno")
+        st.pyplot(st.session_state["generated_fig"])
+
+        # Create PNG and CSV data
         buffer = BytesIO()
-        fig.savefig(buffer, format="png")
+        st.session_state["generated_fig"].savefig(buffer, format="png")
         buffer.seek(0)
 
-        # Create a DataFrame from circle data
         csv_data = pd.DataFrame(
             {
-                "Type": ["Red"] * len(circle_data["red"])
-                + ["Blue"] * len(circle_data["blue"])
-                + ["Green"] * len(circle_data["green"]),
-                "X": [x for x, y in circle_data["red"]]
-                + [x for x, y in circle_data["blue"]]
-                + [x for x, y in circle_data["green"]],
-                "Y": [y for x, y in circle_data["red"]]
-                + [y for x, y in circle_data["blue"]]
-                + [y for x, y in circle_data["green"]],
+                "Type": ["Red"] * len(st.session_state["circle_data"]["red"])
+                + ["Blue"] * len(st.session_state["circle_data"]["blue"])
+                + ["Green"] * len(st.session_state["circle_data"]["green"]),
+                "X": [x for x, y in st.session_state["circle_data"]["red"]]
+                + [x for x, y in st.session_state["circle_data"]["blue"]]
+                + [x for x, y in st.session_state["circle_data"]["green"]],
+                "Y": [y for x, y in st.session_state["circle_data"]["red"]]
+                + [y for x, y in st.session_state["circle_data"]["blue"]]
+                + [y for x, y in st.session_state["circle_data"]["green"]],
             }
         )
         csv_buffer = BytesIO()
@@ -105,14 +117,14 @@ def main():
         col1, col2 = st.columns(2)
         with col1:
             st.download_button(
-                label="Stáhnout plátno jako PNG",
+                label="Stáhnout PNG",
                 data=buffer,
                 file_name="kruhove_platno.png",
                 mime="image/png",
             )
         with col2:
             st.download_button(
-                label="Stáhnout souřadnice jako CSV",
+                label="Stáhnout CSV",
                 data=csv_buffer,
                 file_name="souradnice_kruhu.csv",
                 mime="text/csv",
