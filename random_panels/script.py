@@ -5,7 +5,6 @@ import math
 from io import BytesIO
 import pandas as pd  # For CSV generation
 
-
 # Helper function to check overlap with a gap
 def is_overlapping(x, y, existing_circles, radius, gap_between_circles):
     for cx, cy, r in existing_circles:
@@ -14,8 +13,6 @@ def is_overlapping(x, y, existing_circles, radius, gap_between_circles):
             return True
     return False
 
-
-# Function to generate circles and collect center points
 # Function to generate circles with integer coordinates
 def generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circles):
     circles = []
@@ -42,12 +39,8 @@ def generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circ
     ax.set_aspect("equal", adjustable="box")
     return fig, circle_data
 
-
 # Streamlit App
 def main():
-    # Display the logo at the top of the app
-
-
     st.title("Generátor kruhů")
 
     # Sidebar for inputs
@@ -108,6 +101,16 @@ def main():
                 "Y": [y for x, y in st.session_state["circle_data"]["red"]]
                 + [y for x, y in st.session_state["circle_data"]["blue"]]
                 + [y for x, y in st.session_state["circle_data"]["green"]],
+                "Canvas Width": [canvas_width] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
+                "Canvas Height": [canvas_height] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
+                "Gap Between Circles": [gap_between_circles] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
+                "Red Circle Radius": [red_circle_radius] * len(st.session_state["circle_data"]["red"])
+                + [None] * (len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
+                "Blue Circle Radius": [None] * len(st.session_state["circle_data"]["red"])
+                + [blue_circle_radius] * len(st.session_state["circle_data"]["blue"])
+                + [None] * len(st.session_state["circle_data"]["green"]),
+                "Green Circle Radius": [None] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]))
+                + [green_circle_radius] * len(st.session_state["circle_data"]["green"]),
             }
         )
         csv_buffer = BytesIO()
@@ -130,7 +133,6 @@ def main():
                 file_name="souradnice_kruhu.csv",
                 mime="text/csv",
             )
-
 
 if __name__ == "__main__":
     main()
