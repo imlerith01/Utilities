@@ -59,15 +59,15 @@ def main():
     gap_between_circles = st.sidebar.slider("Minimální mezera mezi kruhy", 0, 50, 5)
 
     st.sidebar.subheader("Červené kruhy")
-    num_red_circles = st.sidebar.slider("Počet červených kruhů", 1, 100, 30)
+    num_red_circles = st.sidebar.slider("Počet červených kruhů", 1, 1000, 30)
     red_circle_radius = st.sidebar.slider("Poloměr červených kruhů", 1, 100, 20)
 
     st.sidebar.subheader("Modré kruhy")
-    num_blue_circles = st.sidebar.slider("Počet modrých kruhů", 1, 100, 20)
+    num_blue_circles = st.sidebar.slider("Počet modrých kruhů", 1, 1000, 20)
     blue_circle_radius = st.sidebar.slider("Poloměr modrých kruhů", 1, 100, 10)
 
     st.sidebar.subheader("Zelené kruhy")
-    num_green_circles = st.sidebar.slider("Počet zelených kruhů", 1, 100, 10)
+    num_green_circles = st.sidebar.slider("Počet zelených kruhů", 1, 1000, 10)
     green_circle_radius = st.sidebar.slider("Poloměr zelených kruhů", 1, 100, 5)
 
     # Initialize session state
