@@ -85,6 +85,16 @@ def main():
         st.write("### Vygenerované plátno")
         st.pyplot(st.session_state["generated_fig"])
 
+        # Calculate and display ratio between surface of canvas and surface of all circles
+        canvas_surface = canvas_width * canvas_height
+        total_circle_surface = (
+            num_red_circles * math.pi * (red_circle_radius ** 2)
+            + num_blue_circles * math.pi * (blue_circle_radius ** 2)
+            + num_green_circles * math.pi * (green_circle_radius ** 2)
+        )
+        ratio = total_circle_surface / canvas_surface
+        st.write(f"### Poměr plochy kruhů k ploše plátna: {ratio:.2f}")
+
         # Create PNG and CSV data
         buffer = BytesIO()
         st.session_state["generated_fig"].savefig(buffer, format="png")
