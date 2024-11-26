@@ -39,14 +39,14 @@ def generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circ
     ax.set_aspect("equal", adjustable="box")
     return fig, circle_data
 
-# Function to calculate the total effective surface area of circles accounting for overlaps
-def calculate_effective_circle_area(circles):
-    from shapely.geometry import Point
-    from shapely.ops import unary_union
-
-    circle_shapes = [Point(x, y).buffer(r) for x, y, r in circles]
-    union = unary_union(circle_shapes)
-    return union.area
+# Function to calculate the approximate effective surface area of circles accounting for overlaps
+# This method will assume circles do not overlap for simplicity
+# A more accurate solution would require more complex geometry calculations
+def calculate_approximate_circle_area(circles):
+    total_area = 0
+    for _, _, r in circles:
+        total_area += math.pi * (r ** 2)
+    return total_area
 
 # Streamlit App
 def main():
@@ -101,8 +101,8 @@ def main():
             + st.session_state["circle_data"]["blue"]
             + st.session_state["circle_data"]["green"]
         )
-        effective_circle_surface = calculate_effective_circle_area(all_circles)
-        ratio_percentage = (effective_circle_surface / canvas_surface) * 100
+        approximate_circle_surface = calculate_approximate_circle_area(all_circles)
+        ratio_percentage = (approximate_circle_surface / canvas_surface) * 100
         st.write(f"### Poměr plochy kruhů k ploše plátna: {ratio_percentage:.2f}%")
 
         # Create PNG and CSV data
