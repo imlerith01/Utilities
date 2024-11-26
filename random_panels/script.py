@@ -33,11 +33,20 @@ def generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circ
                 circles.append((x, y, radius))
                 circle = plt.Circle((x, y), radius, color=color)
                 ax.add_artist(circle)
-                circle_data[label].append((x, y))  # Store center points
+                circle_data[label].append((x, y, radius))  # Store center points and radius
                 added_circles += 1
 
     ax.set_aspect("equal", adjustable="box")
     return fig, circle_data
+
+# Function to calculate the total effective surface area of circles accounting for overlaps
+def calculate_effective_circle_area(circles):
+    from shapely.geometry import Point
+    from shapely.ops import unary_union
+
+    circle_shapes = [Point(x, y).buffer(r) for x, y, r in circles]
+    union = unary_union(circle_shapes)
+    return union.area
 
 # Streamlit App
 def main():
@@ -85,15 +94,16 @@ def main():
         st.write("### Vygenerované plátno")
         st.pyplot(st.session_state["generated_fig"])
 
-        # Calculate and display ratio between surface of canvas and surface of all circles
+        # Calculate and display ratio between surface of canvas and surface of all circles accounting for overlaps
         canvas_surface = canvas_width * canvas_height
-        total_circle_surface = (
-            num_red_circles * math.pi * (red_circle_radius ** 2)
-            + num_blue_circles * math.pi * (blue_circle_radius ** 2)
-            + num_green_circles * math.pi * (green_circle_radius ** 2)
+        all_circles = (
+            st.session_state["circle_data"]["red"]
+            + st.session_state["circle_data"]["blue"]
+            + st.session_state["circle_data"]["green"]
         )
-        ratio_percentage = (total_circle_surface / canvas_surface) * 100
-        st.write(f"### Poměr děrování: {ratio_percentage:.2f}%")
+        effective_circle_surface = calculate_effective_circle_area(all_circles)
+        ratio_percentage = (effective_circle_surface / canvas_surface) * 100
+        st.write(f"### Poměr plochy kruhů k ploše plátna: {ratio_percentage:.2f}%")
 
         # Create PNG and CSV data
         buffer = BytesIO()
@@ -105,12 +115,12 @@ def main():
                 "Type": ["Red"] * len(st.session_state["circle_data"]["red"])
                 + ["Blue"] * len(st.session_state["circle_data"]["blue"])
                 + ["Green"] * len(st.session_state["circle_data"]["green"]),
-                "X": [x for x, y in st.session_state["circle_data"]["red"]]
-                + [x for x, y in st.session_state["circle_data"]["blue"]]
-                + [x for x, y in st.session_state["circle_data"]["green"]],
-                "Y": [y for x, y in st.session_state["circle_data"]["red"]]
-                + [y for x, y in st.session_state["circle_data"]["blue"]]
-                + [y for x, y in st.session_state["circle_data"]["green"]],
+                "X": [x for x, y, r in st.session_state["circle_data"]["red"]]
+                + [x for x, y, r in st.session_state["circle_data"]["blue"]]
+                + [x for x, y, r in st.session_state["circle_data"]["green"]],
+                "Y": [y for x, y, r in st.session_state["circle_data"]["red"]]
+                + [y for x, y, r in st.session_state["circle_data"]["blue"]]
+                + [y for x, y, r in st.session_state["circle_data"]["green"]],
                 "Canvas Width": [canvas_width] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
                 "Canvas Height": [canvas_height] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
                 "Gap Between Circles": [gap_between_circles] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
