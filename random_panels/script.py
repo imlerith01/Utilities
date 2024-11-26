@@ -15,6 +15,7 @@ def is_overlapping(x, y, existing_circles, radius, gap_between_circles):
 
 # Function to generate circles with integer coordinates
 # Function to generate circles with integer coordinates
+# Function to generate circles with integer coordinates allowing them to touch the boundary
 def generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circles):
     circles = []
     circle_data = {"red": [], "blue": [], "green": []}
@@ -29,8 +30,12 @@ def generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circ
         added_circles = 0
         while added_circles < count:
             # Generate x, y coordinates without restricting them away from the canvas boundaries
-            x = round(random.uniform(radius, canvas_width - radius))
-            y = round(random.uniform(radius, canvas_height - radius))
+            x = round(random.uniform(0, canvas_width))
+            y = round(random.uniform(0, canvas_height))
+
+            # Ensure that the circle doesn't go out of bounds
+            if (x - radius < 0) or (x + radius > canvas_width) or (y - radius < 0) or (y + radius > canvas_height):
+                continue
 
             if not is_overlapping(x, y, circles, radius, gap_between_circles):
                 circles.append((x, y, radius))
