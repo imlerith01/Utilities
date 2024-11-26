@@ -52,8 +52,8 @@ def main():
 
     # Sidebar for inputs
     st.sidebar.header("Nastavení plátna")
-    canvas_width = st.sidebar.slider("Šířka plátna", 500, 2000, 1000, step=100)
-    canvas_height = st.sidebar.slider("Výška plátna", 500, 2000, 1000, step=100)
+    canvas_width = st.sidebar.slider("Šířka plátna", 200, 4000, 1000, step=50)
+    canvas_height = st.sidebar.slider("Výška plátna", 200, 4000, 1000, step=50)
 
     st.sidebar.header("Nastavení kruhů")
     gap_between_circles = st.sidebar.slider("Minimální mezera mezi kruhy", 0, 50, 5)
