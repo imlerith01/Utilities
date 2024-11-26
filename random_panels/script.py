@@ -103,7 +103,7 @@ def main():
         )
         approximate_circle_surface = calculate_approximate_circle_area(all_circles)
         ratio_percentage = (approximate_circle_surface / canvas_surface) * 100
-        st.write(f"### Poměr plochy kruhů k ploše plátna: {ratio_percentage:.2f}%")
+        st.write(f"### Poměr děrování: {ratio_percentage:.2f}%")
 
         # Create PNG and CSV data
         buffer = BytesIO()
