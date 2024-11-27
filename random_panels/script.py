@@ -1,47 +1,81 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+from matplotlib.collections import PatchCollection
 import random
 import math
 from io import BytesIO
-import pandas as pd  # For CSV generation
+import pandas as pd
 
-# Helper function to check overlap with a gap
-def is_overlapping(x, y, existing_circles, radius, gap_between_circles):
-    for cx, cy, r in existing_circles:
-        distance = math.sqrt((x - cx) ** 2 + (y - cy) ** 2)
-        if distance < r + radius + gap_between_circles:
-            return True
+
+# Helper function to initialize the grid for spatial partitioning
+def initialize_grid(canvas_width, canvas_height, cell_size):
+    grid = {}
+    for x in range(0, math.ceil(canvas_width / cell_size)):
+        for y in range(0, math.ceil(canvas_height / cell_size)):
+            grid[(x, y)] = []
+    return grid
+
+
+# Optimized overlap check using spatial partitioning
+def is_overlapping_optimized(x, y, radius, grid, cell_size, gap_between_circles):
+    grid_x, grid_y = int(x // cell_size), int(y // cell_size)
+    neighbors = [
+        (grid_x + dx, grid_y + dy)
+        for dx in range(-1, 2)
+        for dy in range(-1, 2)
+        if (grid_x + dx, grid_y + dy) in grid
+    ]
+    for neighbor in neighbors:
+        for cx, cy, r in grid[neighbor]:
+            distance = math.sqrt((x - cx) ** 2 + (y - cy) ** 2)
+            if distance < r + radius + gap_between_circles:
+                return True
     return False
 
-# Function to generate circles with integer coordinates
-def generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circles):
+
+# Optimized function to generate circles
+def generate_circles_optimized(canvas_width, canvas_height, circle_specs, gap_between_circles):
     circles = []
     circle_data = {"red": [], "blue": [], "green": []}
-    fig, ax = plt.subplots(figsize=(10, 10))
-    ax.set_xlim(0, canvas_width)
-    ax.set_ylim(0, canvas_height)
-    ax.set_facecolor("white")
-    ax.axis("off")  # Remove axes for a clean look
+    cell_size = max([spec[1] for spec in circle_specs]) * 2 + gap_between_circles
+    grid = initialize_grid(canvas_width, canvas_height, cell_size)
 
     for spec in circle_specs:
         color, radius, count, label = spec
         added_circles = 0
         while added_circles < count:
-            x = round(random.uniform(radius, canvas_width - radius))  # Ensure integer x
-            y = round(random.uniform(radius, canvas_height - radius))  # Ensure integer y
-            if not is_overlapping(x, y, circles, radius, gap_between_circles):
-                circles.append((x, y, radius))
-                circle = plt.Circle((x, y), radius, color=color)
-                ax.add_artist(circle)
-                circle_data[label].append((x, y))  # Store center points
+            x = random.uniform(radius, canvas_width - radius)
+            y = random.uniform(radius, canvas_height - radius)
+            if not is_overlapping_optimized(x, y, radius, grid, cell_size, gap_between_circles):
+                circles.append((x, y, radius, color))
+                grid_x, grid_y = int(x // cell_size), int(y // cell_size)
+                grid[(grid_x, grid_y)].append((x, y, radius))
+                circle_data[label].append((x, y))
                 added_circles += 1
 
-    ax.set_aspect("equal", adjustable="box")
-    return fig, circle_data
+    return circles, circle_data
+
+
+# Function for batch rendering circles
+def render_circles_batch(circles, canvas_width, canvas_height):
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ax.set_xlim(0, canvas_width)
+    ax.set_ylim(0, canvas_height)
+    ax.set_facecolor("white")
+    ax.axis("off")
+
+    patches = []
+    for x, y, radius, color in circles:
+        patches.append(plt.Circle((x, y), radius, color=color))
+
+    collection = PatchCollection(patches, match_original=True)
+    ax.add_collection(collection)
+    return fig
+
 
 # Streamlit App
 def main():
-    st.title("Generátor kruhů")
+    st.title("Generátor kruhů - Optimalizovaná verze")
 
     # Sidebar for inputs
     st.sidebar.header("Nastavení plátna")
@@ -76,7 +110,8 @@ def main():
             ("blue", blue_circle_radius, num_blue_circles, "blue"),
             ("green", green_circle_radius, num_green_circles, "green"),
         ]
-        fig, circle_data = generate_circles(canvas_width, canvas_height, circle_specs, gap_between_circles)
+        circles, circle_data = generate_circles_optimized(canvas_width, canvas_height, circle_specs, gap_between_circles)
+        fig = render_circles_batch(circles, canvas_width, canvas_height)
         st.session_state["generated_fig"] = fig
         st.session_state["circle_data"] = circle_data
 
@@ -87,11 +122,7 @@ def main():
 
         # Calculate and display ratio between surface of canvas and surface of all circles
         canvas_surface = canvas_width * canvas_height
-        total_circle_surface = (
-            num_red_circles * math.pi * (red_circle_radius ** 2)
-            + num_blue_circles * math.pi * (blue_circle_radius ** 2)
-            + num_green_circles * math.pi * (green_circle_radius ** 2)
-        )
+        total_circle_surface = sum(math.pi * (r ** 2) for _, _, r, _ in circles)
         ratio_percentage = (total_circle_surface / canvas_surface) * 100
         st.write(f"### Poměr děrování: {ratio_percentage:.2f}%")
 
@@ -111,16 +142,6 @@ def main():
                 "Y": [y for x, y in st.session_state["circle_data"]["red"]]
                 + [y for x, y in st.session_state["circle_data"]["blue"]]
                 + [y for x, y in st.session_state["circle_data"]["green"]],
-                "Canvas Width": [canvas_width] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
-                "Canvas Height": [canvas_height] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
-                "Gap Between Circles": [gap_between_circles] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
-                "Red Circle Radius": [red_circle_radius] * len(st.session_state["circle_data"]["red"])
-                + [None] * (len(st.session_state["circle_data"]["blue"]) + len(st.session_state["circle_data"]["green"])),
-                "Blue Circle Radius": [None] * len(st.session_state["circle_data"]["red"])
-                + [blue_circle_radius] * len(st.session_state["circle_data"]["blue"])
-                + [None] * len(st.session_state["circle_data"]["green"]),
-                "Green Circle Radius": [None] * (len(st.session_state["circle_data"]["red"]) + len(st.session_state["circle_data"]["blue"]))
-                + [green_circle_radius] * len(st.session_state["circle_data"]["green"]),
             }
         )
         csv_buffer = BytesIO()
@@ -143,6 +164,7 @@ def main():
                 file_name="souradnice_kruhu.csv",
                 mime="text/csv",
             )
+
 
 if __name__ == "__main__":
     main()
