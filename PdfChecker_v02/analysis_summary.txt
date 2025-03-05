@@ -1,0 +1,28 @@
+--- Analysis Summary ---
+Invalid OutputIntents array format: 21 file(s)
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\2025_01-13-001.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\2025_01-13-101.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\2025_01-13-102.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\2025_01-13-103.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\2025_01-13-104.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\2025_01-13-105.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\2025_01-13-106.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\A-24-0412_PBR_D.1.3_XXX_TZ profese.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\Meinel_A-24-0412_ASR_C_003_Situaèní výkresy-107.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\Situace 2025-01-14.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\__TZ PBR 2025-01-14 - sign.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\__výkresy PBR 2025-01-14____1PP__0,5NP__1NP__2NP__3NP__støecha__situace  - sign.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\archiv\A-24-0412_PBR_D.1.3_XXX_výkresy k 03.01.2025\2025-01-02.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\finále 2025-01-17\2025_01-17-001.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\finále 2025-01-17\2025_01-17-101.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\finále 2025-01-17\2025_01-17-102.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\finále 2025-01-17\2025_01-17-103.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\finále 2025-01-17\2025_01-17-104.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\finále 2025-01-17\2025_01-17-105.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\finále 2025-01-17\2025_01-17-106.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\finále 2025-01-17\2025_01-17-107.pdf
+Not PDF/A compliant (OutputIntent S subtype: null): 2 file(s)
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\finále 2025-01-17\___TZ PBR_pdf-A-3b - sign.pdf
+  - C:\Users\dvoracek\DC\ACCDocs\Atelier 99 s.r.o-\ZS Malse\Project Files\002_SDILENE\03_PBR\finále 2025-01-17\___TZ výkresy_pdf-A-3b - sign.pdf
+
+Total files analyzed: 23
