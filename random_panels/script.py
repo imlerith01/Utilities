@@ -153,8 +153,8 @@ def main():
     # Formulář v sidebaru – žádné průběžné přepočty při posouvání sliderů
     with st.sidebar.form("cfg"):
         st.header("Nastavení plátna")
-        canvas_width = st.slider("Šířka plátna", 200, 3000, 1000, step=50)
-        canvas_height = st.slider("Výška plátna", 200, 3000, 1000, step=50)
+        canvas_width = st.slider("Šířka plátna", 200, 5000, 1000, step=50)
+        canvas_height = st.slider("Výška plátna", 200, 5000, 1000, step=50)
 
         st.header("Nastavení kruhů")
         gap_between_circles = st.slider("Minimální mezera mezi kruhy", 0, 50, 5, step=1)
