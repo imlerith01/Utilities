@@ -172,15 +172,15 @@ def main():
         preview_width_px = st.slider("Šířka náhledu (px)", 300, 1200, 800, step=10)
 
         st.subheader("Červené kruhy")
-        num_red_circles = st.slider("Počet červených kruhů", 0, 300, 50)
+        num_red_circles = st.slider("Počet červených kruhů", 0, 500, 50)
         red_circle_radius = st.slider("Poloměr červených kruhů", 1, 100, 20)
 
         st.subheader("Modré kruhy")
-        num_blue_circles = st.slider("Počet modrých kruhů", 0, 500, 50)
+        num_blue_circles = st.slider("Počet modrých kruhů", 0, 800, 50)
         blue_circle_radius = st.slider("Poloměr modrých kruhů", 1, 100, 10)
 
         st.subheader("Zelené kruhy")
-        num_green_circles = st.slider("Počet zelených kruhů", 0, 1000, 50)
+        num_green_circles = st.slider("Počet zelených kruhů", 0, 1500, 50)
         green_circle_radius = st.slider("Poloměr zelených kruhů", 1, 100, 5)
 
         submitted = st.form_submit_button("Generovat")
