@@ -11,7 +11,7 @@ import pandas as pd
 class SpatialIndex:
     def __init__(self, cell_size: int, neighbor_span: int = 2):
         """
-        cell_size: velikost jedné buňky mřížky (px)
+        cell_size: velikost buňky mřížky (px)
         neighbor_span: jak daleko (v buňkách) se má při kolizi dívat do okolí (±neighbor_span).
                        2 => 5×5 okolí, bezpečné pro směs poloměrů.
         """
@@ -46,8 +46,7 @@ class SpatialIndex:
             for idx in self.grid.get(k, []):
                 dx = x - self.cx[idx]
                 dy = y - self.cy[idx]
-                # Minimální povolená vzdálenost středů:
-                lim = r + self.cr[idx] + gap
+                lim = r + self.cr[idx] + gap  # minimální povolená vzdálenost středů
                 if dx * dx + dy * dy < lim * lim:
                     return True
         return False
@@ -79,7 +78,7 @@ def generate_circles_fast(canvas_w, canvas_h, circle_specs, gap, max_attempts_pe
     circle_specs: list[(color:str, radius:int, count:int, label:str)]
     Vrací: (matplotlib.Figure, list[dict]) – fig, rows
     """
-    # Varování kapacity
+    # Varování kapacity (nezastavuje generování)
     req_area, cap_area = capacity_check(canvas_w, canvas_h, circle_specs, gap)
     if cap_area > 0 and req_area > cap_area:
         ratio = 100.0 * req_area / cap_area
@@ -101,6 +100,7 @@ def generate_circles_fast(canvas_w, canvas_h, circle_specs, gap, max_attempts_pe
     for color, radius, count, label in circle_specs:
         placed = 0
         attempts = 0
+        # upper bound pokusů roste s plochou plátna / plochou kruhu
         local_max_attempts = max_attempts_per_circle + int((canvas_w * canvas_h) / (math.pi * radius * radius) * 0.5)
 
         while placed < count and attempts < local_max_attempts:
@@ -128,7 +128,7 @@ def generate_circles_fast(canvas_w, canvas_h, circle_specs, gap, max_attempts_pe
         if placed < count:
             st.warning(f"Nepodařilo se umístit {count - placed} z {count} „{label}“ (hustota/hledání).")
 
-    # Vykreslení až po generování – bez obrysu (linewidth=0) kvůli optickému „dotyku“
+    # Vykreslení až po generování – bez obrysu (linewidth=0)
     fig, ax = plt.subplots(figsize=(10, 10))
     ax.set_xlim(0, canvas_w)
     ax.set_ylim(0, canvas_h)
@@ -150,34 +150,37 @@ def main():
     st.set_page_config(page_title="Generátor kruhů — rychlý", layout="wide")
     st.title("Generátor kruhů — rychlý a stabilní")
 
-    # Formulář v sidebaru – žádné průběžné přepočty
+    # Formulář v sidebaru – žádné průběžné přepočty při posouvání sliderů
     with st.sidebar.form("cfg"):
         st.header("Nastavení plátna")
-        canvas_width = st.slider("Šířka plátna", 200, 4000, 1000, step=50)
-        canvas_height = st.slider("Výška plátna", 200, 4000, 1000, step=50)
+        canvas_width = st.slider("Šířka plátna", 200, 3000, 1000, step=50)
+        canvas_height = st.slider("Výška plátna", 200, 3000, 1000, step=50)
 
         st.header("Nastavení kruhů")
-        gap_between_circles = st.slider("Minimální mezera mezi kruhy", 0, 100, 5)
-        max_attempts_per_circle = st.slider("Max. počet pokusů na 1 kruh", 50, 20000, 5000, step=50)
+        gap_between_circles = st.slider("Minimální mezera mezi kruhy", 0, 50, 5, step=1)
+        max_attempts_per_circle = st.slider("Max. počet pokusů na 1 kruh", 50, 10000, 2000, step=100)
 
         st.header("Reprodukovatelnost")
         use_seed = st.checkbox("Použít seed (opakovatelná generace)?", value=False)
         seed_value = st.number_input("Seed", min_value=0, max_value=2**32 - 1, value=42, step=1)
 
         st.header("Export")
-        png_dpi = st.slider("DPI pro PNG export", 72, 600, 200, step=4)
+        png_dpi = st.slider("DPI pro PNG export", 72, 400, 200, step=4)
+
+        st.header("Náhled")
+        preview_width_px = st.slider("Šířka náhledu (px)", 300, 1200, 800, step=10)
 
         st.subheader("Červené kruhy")
-        num_red_circles = st.slider("Počet červených kruhů", 0, 5000, 300)
-        red_circle_radius = st.slider("Poloměr červených kruhů", 1, 300, 20)
+        num_red_circles = st.slider("Počet červených kruhů", 0, 300, 50)
+        red_circle_radius = st.slider("Poloměr červených kruhů", 1, 100, 20)
 
         st.subheader("Modré kruhy")
-        num_blue_circles = st.slider("Počet modrých kruhů", 0, 5000, 300)
-        blue_circle_radius = st.slider("Poloměr modrých kruhů", 1, 300, 10)
+        num_blue_circles = st.slider("Počet modrých kruhů", 0, 300, 50)
+        blue_circle_radius = st.slider("Poloměr modrých kruhů", 1, 100, 10)
 
         st.subheader("Zelené kruhy")
-        num_green_circles = st.slider("Počet zelených kruhů", 0, 5000, 300)
-        green_circle_radius = st.slider("Poloměr zelených kruhů", 1, 300, 5)
+        num_green_circles = st.slider("Počet zelených kruhů", 0, 300, 50)
+        green_circle_radius = st.slider("Poloměr zelených kruhů", 1, 100, 5)
 
         submitted = st.form_submit_button("Generovat")
 
@@ -202,7 +205,7 @@ def main():
             int(max_attempts_per_circle), rng
         )
 
-        # Uložit PNG do paměti a zavřít fig
+        # Uložit PNG do paměti a zavřít fig kvůli paměti
         png_buffer = BytesIO()
         fig.savefig(png_buffer, format="png", dpi=int(png_dpi), bbox_inches="tight")
         png_buffer.seek(0)
@@ -214,20 +217,23 @@ def main():
     # Výstup
     if st.session_state["rows"]:
         st.write("### Vygenerované plátno")
-        st.image(st.session_state["image_bytes"], caption="Náhled PNG", use_container_width=True)
+        st.image(st.session_state["image_bytes"], caption="Náhled PNG", width=int(preview_width_px))
 
         df = pd.DataFrame(st.session_state["rows"])
+        # Skutečné pokrytí podle opravdu umístěných kruhů
         total_circle_surface = float(np.pi * np.sum(np.square(df["Radius"])))
         canvas_surface = float(canvas_width * canvas_height)
         ratio_percentage = (total_circle_surface / max(1.0, canvas_surface)) * 100.0
         st.write(f"### Poměr děrování (pokrytí): {ratio_percentage:.2f}%")
         st.caption("Počítáno ze skutečně umístěných kruhů.")
 
+        # Přehled počtů podle typu
         counts = df["Type"].value_counts().to_dict()
         st.write("**Počty umístěných kruhů:** " +
                  ", ".join([f"{k}: {v}" for k, v in counts.items()]) +
                  f" (celkem {len(df)})")
 
+        # Download – PNG
         st.download_button(
             label="Stáhnout PNG",
             data=st.session_state["image_bytes"],
@@ -235,6 +241,7 @@ def main():
             mime="image/png",
         )
 
+        # Download – CSV
         csv_buffer = BytesIO()
         df.to_csv(csv_buffer, index=False)
         csv_buffer.seek(0)
