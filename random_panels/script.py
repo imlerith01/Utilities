@@ -10,29 +10,22 @@ import pandas as pd
 # =========================
 class SpatialIndex:
     def __init__(self, cell_size: int, neighbor_span: int = 2):
-        """
-        cell_size: velikost buňky mřížky (px)
-        neighbor_span: jak daleko (v buňkách) se má při kolizi dívat do okolí (±neighbor_span).
-                       2 => 5×5 okolí, bezpečné pro směs poloměrů.
-        """
         self.cell = float(max(1, cell_size))
         self.span = int(max(1, neighbor_span))
-        self.grid = {}  # (ix, iy) -> list[int] (indexy do polí níže)
-        self.cx = []    # x středy
-        self.cy = []    # y středy
-        self.cr = []    # poloměry
+        self.grid = {}
+        self.cx, self.cy, self.cr = [], [], []
 
-    def _key(self, x: float, y: float):
+    def _key(self, x, y):
         return (int(x // self.cell), int(y // self.cell))
 
-    def _neighbors(self, x: float, y: float):
+    def _neighbors(self, x, y):
         ix, iy = self._key(x, y)
         s = self.span
         for dx in range(-s, s + 1):
             for dy in range(-s, s + 1):
                 yield (ix + dx, iy + dy)
 
-    def add(self, x: int, y: int, r: int):
+    def add(self, x, y, r):
         idx = len(self.cx)
         self.cx.append(x)
         self.cy.append(y)
@@ -40,29 +33,19 @@ class SpatialIndex:
         k = self._key(x, y)
         self.grid.setdefault(k, []).append(idx)
 
-    def overlaps(self, x: int, y: int, r: int, gap: int) -> bool:
-        """True, pokud (x,y,r) koliduje s existujícím kruhem (s mezerou 'gap')."""
+    def overlaps(self, x, y, r, gap):
         for k in self._neighbors(x, y):
             for idx in self.grid.get(k, []):
-                dx = x - self.cx[idx]
-                dy = y - self.cy[idx]
-                lim = r + self.cr[idx] + gap  # minimální povolená vzdálenost středů
+                dx, dy = x - self.cx[idx], y - self.cy[idx]
+                lim = r + self.cr[idx] + gap
                 if dx * dx + dy * dy < lim * lim:
                     return True
         return False
 
 
-# =========================
-#  Rychlý odhad kapacity (varování před přehnanými počty)
-# =========================
 def capacity_check(canvas_w, canvas_h, specs, gap):
-    """
-    specs: [(color, radius, count, label), ...]
-    Vrací tuple (requested_area, practical_capacity_area)
-    """
     canvas_area = float(canvas_w * canvas_h)
     requested_area = float(sum(c * math.pi * r * r for _, r, c, _ in specs))
-    # cca hex packing 90.69 %, ale s rezervou a penalizací za mezery:
     practical_fill = 0.9069 * 0.80
     max_r = max((r for _, r, _, _ in specs), default=1)
     gap_penalty = 1.0 + (gap / max(1, max_r)) * 0.5
@@ -70,49 +53,34 @@ def capacity_check(canvas_w, canvas_h, specs, gap):
     return requested_area, practical_cap
 
 
-# =========================
-#  Generování kruhů s prostorovým indexem
-# =========================
 def generate_circles_fast(canvas_w, canvas_h, circle_specs, gap, max_attempts_per_circle, rng):
-    """
-    circle_specs: list[(color:str, radius:int, count:int, label:str)]
-    Vrací: (matplotlib.Figure, list[dict]) – fig, rows
-    """
-    # Varování kapacity (nezastavuje generování)
     req_area, cap_area = capacity_check(canvas_w, canvas_h, circle_specs, gap)
     if cap_area > 0 and req_area > cap_area:
         ratio = 100.0 * req_area / cap_area
         st.warning(
             f"Požadovaná plocha kruhů je ~{ratio:.0f}% praktického maxima. "
-            "Může to zpomalit generování a snížit počet úspěšně umístěných kruhů. "
-            "Zvažte větší plátno, menší poloměry nebo menší počty."
+            "Může to zpomalit generování a snížit počet úspěšně umístěných kruhů."
         )
 
-    # Umisťuj od největších poloměrů k nejmenším
     circle_specs = sorted(circle_specs, key=lambda t: t[1], reverse=True)
     max_r = max((r for _, r, _, _ in circle_specs), default=1)
-
-    # Buňka mřížky = (max_r + gap); sousedství 5×5 (span=2) pokrývá i dvě největší sousední buňky
-    cell_size = int(max(1, max_r + gap))
-    si = SpatialIndex(cell_size=cell_size, neighbor_span=2)
+    si = SpatialIndex(cell_size=int(max(1, max_r + gap)), neighbor_span=2)
 
     rows = []
     for color, radius, count, label in circle_specs:
         placed = 0
         attempts = 0
-        # upper bound pokusů roste s plochou plátna / plochou kruhu
         local_max_attempts = max_attempts_per_circle + int((canvas_w * canvas_h) / (math.pi * radius * radius) * 0.5)
 
         while placed < count and attempts < local_max_attempts:
             x = int(rng.integers(radius, canvas_w - radius + 1))
             y = int(rng.integers(radius, canvas_h - radius + 1))
-
             if not si.overlaps(x, y, radius, gap):
                 si.add(x, y, radius)
                 rows.append({
                     "ID": len(rows) + 1,
-                    "Type": label.capitalize(),  # "Red"/"Blue"/"Green"
-                    "Color": color,              # "red"/"blue"/"green"
+                    "Type": label.capitalize(),
+                    "Color": color,
                     "X": x,
                     "Y": y,
                     "Radius": int(radius),
@@ -124,11 +92,10 @@ def generate_circles_fast(canvas_w, canvas_h, circle_specs, gap, max_attempts_pe
                 attempts = 0
             else:
                 attempts += 1
-
         if placed < count:
             st.warning(f"Nepodařilo se umístit {count - placed} z {count} „{label}“ (hustota/hledání).")
 
-    # Vykreslení až po generování – bez obrysu (linewidth=0)
+    # ============ ZMĚNA: všechny kruhy se kreslí černě ============
     fig, ax = plt.subplots(figsize=(10, 10))
     ax.set_xlim(0, canvas_w)
     ax.set_ylim(0, canvas_h)
@@ -137,20 +104,17 @@ def generate_circles_fast(canvas_w, canvas_h, circle_specs, gap, max_attempts_pe
     ax.axis("off")
 
     for row in rows:
-        c = plt.Circle((row["X"], row["Y"]), row["Radius"], color=row["Color"], linewidth=0)
+        c = plt.Circle((row["X"], row["Y"]), row["Radius"], color="black", linewidth=0)
         ax.add_artist(c)
+    # ===============================================================
 
     return fig, rows
 
 
-# =========================
-#  Streamlit aplikace
-# =========================
 def main():
-    st.set_page_config(page_title="Generátor kruhů — rychlý", layout="wide")
-    st.title("Generátor kruhů — rychlý a stabilní")
+    st.set_page_config(page_title="Generátor kruhů — černé zobrazení", layout="wide")
+    st.title("Generátor kruhů — všechno černé (dočasně)")
 
-    # Formulář v sidebaru – žádné průběžné přepočty při posouvání sliderů
     with st.sidebar.form("cfg"):
         st.header("Nastavení plátna")
         canvas_width = st.slider("Šířka plátna", 200, 5000, 1000, step=50)
@@ -166,8 +130,6 @@ def main():
 
         st.header("Export")
         png_dpi = st.slider("DPI pro PNG export", 72, 400, 200, step=4)
-
-        st.header("Náhled")
         preview_width_px = st.slider("Šířka náhledu (px)", 300, 1200, 800, step=10)
 
         st.subheader("Červené kruhy")
@@ -184,18 +146,16 @@ def main():
 
         submitted = st.form_submit_button("Generovat")
 
-    # Session state
     if "rows" not in st.session_state:
         st.session_state["rows"] = None
     if "image_bytes" not in st.session_state:
         st.session_state["image_bytes"] = None
 
-    # Generování po odeslání formuláře
     if submitted:
         rng = np.random.default_rng(seed_value) if use_seed else np.random.default_rng()
         circle_specs = [
-            ("red",   int(red_circle_radius),   int(num_red_circles),   "red"),
-            ("blue",  int(blue_circle_radius),  int(num_blue_circles),  "blue"),
+            ("red", int(red_circle_radius), int(num_red_circles), "red"),
+            ("blue", int(blue_circle_radius), int(num_blue_circles), "blue"),
             ("green", int(green_circle_radius), int(num_green_circles), "green"),
         ]
 
@@ -205,35 +165,29 @@ def main():
             int(max_attempts_per_circle), rng
         )
 
-        # Uložit PNG do paměti a zavřít fig kvůli paměti
         png_buffer = BytesIO()
         fig.savefig(png_buffer, format="png", dpi=int(png_dpi), bbox_inches="tight")
         png_buffer.seek(0)
         st.session_state["image_bytes"] = png_buffer.read()
         plt.close(fig)
-
         st.session_state["rows"] = rows
 
-    # Výstup
     if st.session_state["rows"]:
         st.write("### Vygenerované plátno")
         st.image(st.session_state["image_bytes"], caption="Náhled PNG", width=int(preview_width_px))
 
         df = pd.DataFrame(st.session_state["rows"])
-        # Skutečné pokrytí podle opravdu umístěných kruhů
         total_circle_surface = float(np.pi * np.sum(np.square(df["Radius"])))
         canvas_surface = float(canvas_width * canvas_height)
         ratio_percentage = (total_circle_surface / max(1.0, canvas_surface)) * 100.0
         st.write(f"### Poměr děrování (pokrytí): {ratio_percentage:.2f}%")
         st.caption("Počítáno ze skutečně umístěných kruhů.")
 
-        # Přehled počtů podle typu
         counts = df["Type"].value_counts().to_dict()
         st.write("**Počty umístěných kruhů:** " +
                  ", ".join([f"{k}: {v}" for k, v in counts.items()]) +
                  f" (celkem {len(df)})")
 
-        # Download – PNG
         st.download_button(
             label="Stáhnout PNG",
             data=st.session_state["image_bytes"],
@@ -241,7 +195,6 @@ def main():
             mime="image/png",
         )
 
-        # Download – CSV
         csv_buffer = BytesIO()
         df.to_csv(csv_buffer, index=False)
         csv_buffer.seek(0)
@@ -252,7 +205,7 @@ def main():
             mime="text/csv",
         )
     else:
-        st.info("Nastav parametry v levém panelu a klikni na **Generovat**.")
+        st.info("Nastav parametry a klikni na **Generovat**.")
 
 
 if __name__ == "__main__":
